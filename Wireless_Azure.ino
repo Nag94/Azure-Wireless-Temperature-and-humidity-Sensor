@@ -9,12 +9,12 @@
 #include "Esp32MQTTClient.h"
 
 #define INTERVAL 10000
-#define DEVICE_ID "esp32demo1"
+#define DEVICE_ID "Enter Device ID here"
 #define MESSAGE_MAX_LEN 256
 
 // Please input the SSID and password of WiFi
-const char* ssid     = "NETGEAR";
-const char* password = "ab123456789";
+const char* ssid     = "Enter SSID here";
+const char* password = "Enter Password here";
 
 // Data upload timer will run for the interval of 20s
 unsigned long msg_Interval = 120000;
@@ -23,7 +23,7 @@ unsigned long msg_Timer = 0;
 /*String containing Hostname, Device Id & Device Key in the format:                         */
 /*  "HostName=<host_name>;DeviceId=<device_id>;SharedAccessKey=<device_key>"                */
 /*  "HostName=<host_name>;DeviceId=<device_id>;SharedAccessSignature=<device_sas_token>"    */
-static const char* connectionString = "HostName=ncdio.azure-devices.net;DeviceId=esp32demo1;SharedAccessKey=XB21V5yiShM9X2OlBldstdfUi4DOZAJSTzSK6x/rtMo=";
+static const char* connectionString = "Enter Azure Connection String here";
 
 const char *messageData = "{\"deviceId\":\"%s\", \"messageId\":%d, \"TemperatureF\":%.2f, \"Humidity\":%.2f, \"TemperatureC\":%.2f, \"Battery\":%.2f}";
 
