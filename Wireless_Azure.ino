@@ -25,18 +25,20 @@ unsigned long msg_Timer = 0;
 /*  "HostName=<host_name>;DeviceId=<device_id>;SharedAccessSignature=<device_sas_token>"    */
 static const char* connectionString = "Enter Azure Connection String here";
 
+//Create a char variable to store our JSON format
 const char *messageData = "{\"deviceId\":\"%s\", \"messageId\":%d, \"TemperatureF\":%.2f, \"Humidity\":%.2f, \"TemperatureC\":%.2f, \"Battery\":%.2f}";
 
-
+//variable to keep the count of msg delivered
 int messageCount = 1;
+
 static bool messageSending = true;
 
-
+// Size of frame
 uint8_t data[29];
 int k = 10;
 int i;
 
-
+//variable to store temp,humid,battery and other values
 static float humidity; 
 static int16_t cTempint; 
 static float cTemp ;
@@ -44,6 +46,7 @@ static float fTemp ;
 static float battery ;
 static float voltage ;
 
+//Callback to check the confirmation frome azure
 static void SendConfirmationCallback(IOTHUB_CLIENT_CONFIRMATION_RESULT result)
 {
   if (result == IOTHUB_CLIENT_CONFIRMATION_OK)
@@ -52,6 +55,7 @@ static void SendConfirmationCallback(IOTHUB_CLIENT_CONFIRMATION_RESULT result)
   }
 }
 
+//payload callback
 static void MessageCallback(const char* payLoad, int size)
 {
   Serial.println("Message callback:");
@@ -72,6 +76,7 @@ static void DeviceTwinCallback(DEVICE_TWIN_UPDATE_STATE updateState, const unsig
   free(temp);
 }
 
+//device connection callback
 static int  DeviceMethodCallback(const char *methodName, const unsigned char *payload, int size, unsigned char **response, int *response_size)
 {
   LogInfo("Try to invoke method %s", methodName);
@@ -104,6 +109,7 @@ static int  DeviceMethodCallback(const char *methodName, const unsigned char *pa
 
 void setup()
 {
+  
   Serial1.begin(115200, SERIAL_8N1, 16, 17); // pins 16 rx2, 17 tx2, 19200 bps, 8 bits no parity 1 stop bit​
   
   Serial.begin(9600);
@@ -119,7 +125,9 @@ void setup()
   
   Serial.println(" > IoT Hub");
   Esp32MQTTClient_SetOption(OPTION_MINI_SOLUTION_NAME, "GetStarted");
+  //initialise
   Esp32MQTTClient_Init((const uint8_t*)connectionString, true);
+  //Set different callbacks
   Esp32MQTTClient_SetSendConfirmationCallback(SendConfirmationCallback);
   Esp32MQTTClient_SetMessageCallback(MessageCallback);
   Esp32MQTTClient_SetDeviceTwinCallback(DeviceTwinCallback);
@@ -132,6 +140,7 @@ void loop()
   {
     data[0] = Serial1.read();
     delay(k);
+    //chck for start byte
    if(data[0]==0x7E)
     {
     while (!Serial1.available());
@@ -191,17 +200,23 @@ else
     }
   }
 
-
+//if message sending is true, send data to azure after 2 min
 if(messageSending){
 if(millis()-msg_Timer >= msg_Interval){
      msg_Timer = millis();
      Serial.println("Sending Message");
    // Send teperature data
       char messagePayload[MESSAGE_MAX_LEN];
+      //snprintf stores the data in char buffer
+      //snprintf(char buffer,  size of buffer,   format,    arg1,      arg2,            arg3,arg4,    arg5,  arg6)
       snprintf(messagePayload,MESSAGE_MAX_LEN, messageData, DEVICE_ID, messageCount++, fTemp,humidity,cTemp,voltage);
+      //here we are printing the buffer
       Serial.println(messagePayload);
+      //create an event MESSAGE(message) to send the buffer(messagPayload) to Azure  
       EVENT_INSTANCE* message = Esp32MQTTClient_Event_Generate(messagePayload, MESSAGE);
+      // add an event property(optional)
       Esp32MQTTClient_Event_AddProp(message, "temperatureAlert", "true");
+      //send the event to azure
       Esp32MQTTClient_SendEventInstance(message); 
       delay(50);     
   }
