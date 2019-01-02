@@ -1,8 +1,11 @@
 #r "Newtonsoft.Json"
+#r "SendGrid"
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Net;
-
+using System.Net.Mail;
+using SendGrid.Helpers.Mail;
+using Microsoft.Extensions.Logging;
 
 public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceWriter log)
 {
