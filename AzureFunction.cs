@@ -6,6 +6,18 @@ using System.Net;
 
 public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceWriter log)
 {
+   //From Mail  
+  string fromMail="Enter From Email";
+  //To mail
+  string toMail="Enter To Email";
+  int smtpPort = 587;
+  string smtpUserName ="Enter Username";  
+  //Password
+  string smtpPassword = "Enter Password";  
+  //Host Id
+  string smtpHost = "smtp.sendgrid.net";  
+  string subject = "Temperature Alert!!!";  
+  string mailMessage = "Temperature has reached beyond 30"; 
   double humidity;
   int rawTemp ;
   double Ctemp ;
@@ -14,9 +26,19 @@ public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceW
   string utcEnque ;
   string utcProcess ;
   string connString = "https://api.powerbi.com/beta/************************";
+  MailMessage mail = new MailMessage(fromMail,toMail);
+  SmtpClient smtpClient = new SmtpClient();
+  smtpClient.Port = smtpPort;
+  smtpClient.DeliveryMethod = SmtpDeliveryMethod.Network;
+  smtpClient.UseDefaultCredentials = false;
+  smtpClient.Host = smtpHost;
+  smtpClient.Credentials = new System.Net.NetworkCredential(smtpUserName,smtpPassword);
+  mail.Subject = subject;
+  mail.Body = mailMessage;
   HttpClient client = new HttpClient();
   dynamic content = await req.Content.ReadAsStringAsync();
   Product product = new Product();
+  
   log.Info("C# HTTP trigger function processed a request: " + content);
   
   JArray array = JArray.Parse($"{await req.Content.ReadAsStringAsync()}");
@@ -46,7 +68,10 @@ public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceW
       product.EventEnqueuedUtcTime=utcEnque;
     
      }
-    
+   
+     if(product.Ctemperature > 30.00){
+              smtpClient.Send(mail);
+     }
      
      string output = JsonConvert.SerializeObject(product);
 
