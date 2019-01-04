@@ -21,8 +21,8 @@
 #define MESSAGE_MAX_LEN 256
 
 // Please input the SSID and password of WiFi
-const char* ssid     = "NETGEAR";
-const char* password = "ab123456789";
+const char* ssid     = "Update sssid";
+const char* password = "Update password";
 
  //Data upload timer will run for the interval of 20s
 unsigned long msg_Interval = 120000;
@@ -35,7 +35,7 @@ unsigned long stream_Timer = 0;
 /*  "HostName=<host_name>;DeviceId=<device_id>;SharedAccessSignature=<device_sas_token>"    */
 
 //Connection String to interface your device with IoT hub
-static const char* connectionString = "HostName=ncdio.azure-devices.net;DeviceId=esp32demo1;SharedAccessKey=XB21V5yiShM9X2OlBldstdfUi4DOZAJSTzSK6x/rtMo=";
+static const char* connectionString = "Enter Connection String";
 
 //Create a char variable to store our JSON format
 const char *messageData = "{\"deviceFormat\":\"%s\",\"deviceId\":\"%s\", \"messageId\":%d, \"TemperatureF\":%.2f, \"Humidity\":%.2f, \"TemperatureC\":%.2f, \"Battery\":%.2f}";
